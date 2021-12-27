@@ -1,0 +1,19 @@
+{
+  "name": "learning",
+  "version": "1.0.0",
+  "description": "empovment of my skill",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RavindraLodhi/neture_learning.git"
+  },
+  "author": "Ravindra",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RavindraLodhi/neture_learning/issues"
+  },
+  "homepage": "https://github.com/RavindraLodhi/neture_learning#readme"
+}
