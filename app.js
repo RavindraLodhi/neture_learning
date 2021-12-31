@@ -13,6 +13,19 @@ const app = express();
 app.use(express.json());
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`))
 
+//common middelware 
+
+app.use((req,res,next) =>{
+    console.log("Hello from comman middleware...");
+    next();
+})
+
+//Other own middelware
+app.use((req,res,next) =>{
+    req.time = new Date().toISOString();
+    next();
+})
+
 //Optimization code
 
 const getAllTour = (req, res) => {
@@ -69,6 +82,7 @@ const createPost = (req, res) => {
 }
 
 const updateTour = (req, res) => {
+    console.log(req.time);
     res.status(200)
         .json({
             status: 'success',
@@ -95,12 +109,19 @@ const deleteTour = (req, res) => {
 }
 //Create get api for v1 and endpoint is tours
 
-app.get('/api/v1/tours', getAllTour)
-app.get('/api/v1/tours/:id', getTour)
-app.post('/api/v1/tours', createPost)
-app.patch('/api/v1/tours/:id', updateTour);
-app.delete('/api/v1/tours/:id', deleteTour)
+// app.get('/api/v1/tours', getAllTour)
+// app.get('/api/v1/tours/:id', getTour)
+// app.post('/api/v1/tours', createPost)
+// app.patch('/api/v1/tours/:id', updateTour);
+// app.delete('/api/v1/tours/:id', deleteTour)
 
+app.route('/api/v1/tours')
+  .get(getAllTour)
+  .post(createPost);
+app.route('/api/v1/tours/:id')
+  .get(getTour)
+  .patch(updateTour)
+  .delete(deleteTour);
 
 const port = 8080;
 app.listen(port, () => {
