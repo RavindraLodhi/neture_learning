@@ -1,7 +1,8 @@
-//core module should import top 
-const fs = require('fs')
+//IMPORT MODULE
 const express = require('express');
-const res = require('express/lib/response');
+const morgan = require('morgan');
+const toursRouter = require('./routes/toursRoutes');
+const usersRouter = require('./routes/usersRoutes')
 
 const app = express();
 
@@ -10,120 +11,23 @@ const app = express();
  * middelware just a function that convert the incomming request data
  */
 
+//MIDDLEWARE 
 app.use(express.json());
-const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`))
 
-//common middelware 
+// THIRD PARTY MIDDLE WARE
+app.use(morgan('dev'))
 
-app.use((req,res,next) =>{
+app.use((req, res, next) => {
     console.log("Hello from comman middleware...");
     next();
 })
 
-//Other own middelware
-app.use((req,res,next) =>{
+app.use((req, res, next) => {
     req.time = new Date().toISOString();
     next();
 })
 
-//Optimization code
+app.use('/api/v1/tours', toursRouter);
+app.use('/api/v1/users', usersRouter);
 
-const getAllTour = (req, res) => {
-    res.status(200)
-        .json({
-            status: 'success',
-            results: tours.length,
-            data: {
-                tours
-            }
-        })
-}
-
-const getTour = (req, res) => {
-    const ID = req.params.id * 1;
-    const tour = tours.find((ele) => ele.id === ID);
-    if (!tour) {
-        return res.status(404)
-            .json({
-                status: 'faild',
-                messege: "Invalid ID"
-            })
-    }
-
-    res.status(200)
-        .json({
-            status: 'success',
-            data: {
-                tours
-            }
-        })
-}
-
-const createPost = (req, res) => {
-    //   console.log(req.body);
-    const id = tours[tours.length - 1].id + 1;
-    console.log(id);
-    const newTour = Object.assign({ id: id }, req.body);
-    console.log(newTour);
-    tours.push(newTour);
-    fs.writeFile(`${__dirname}/dev-data/data/tours-simple.json`, JSON.stringify(tours), err => {
-        if (!err) {
-            res.status(200)
-                .json({
-                    status: 'success',
-                    data: {
-                        tour: newTour
-                    }
-                })
-        } else {
-            console.log(err);
-        }
-    })
-}
-
-const updateTour = (req, res) => {
-    console.log(req.time);
-    res.status(200)
-        .json({
-            status: 'success',
-            data: '<h1>Tour updated!'
-        })
-}
-
-const deleteTour = (req, res) => {
-    const ID = req.params.id * 1;
-    const tour = tours.find((ele) => ele.id === ID);
-    if (!tour) {
-        return res.status(404)
-            .json({
-                status: 'faild',
-                messege: "Invalid ID"
-            })
-    }
-
-    res.status(200)
-        .json({
-            status: 'success',
-            data: null
-        })
-}
-//Create get api for v1 and endpoint is tours
-
-// app.get('/api/v1/tours', getAllTour)
-// app.get('/api/v1/tours/:id', getTour)
-// app.post('/api/v1/tours', createPost)
-// app.patch('/api/v1/tours/:id', updateTour);
-// app.delete('/api/v1/tours/:id', deleteTour)
-
-app.route('/api/v1/tours')
-  .get(getAllTour)
-  .post(createPost);
-app.route('/api/v1/tours/:id')
-  .get(getTour)
-  .patch(updateTour)
-  .delete(deleteTour);
-
-const port = 8080;
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}.`);
-})
+module.exports = app;
