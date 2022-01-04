@@ -15,12 +15,17 @@ const app = express();
 app.use(express.json());
 
 // THIRD PARTY MIDDLE WARE
-app.use(morgan('dev'))
+if(process.env.NODE_ENV === 'development'){
+    app.use(morgan('dev'));
+}
+
+app.use(express.static(`${__dirname}/public`));
 
 app.use((req, res, next) => {
     console.log("Hello from comman middleware...");
     next();
 })
+
 
 app.use((req, res, next) => {
     req.time = new Date().toISOString();
